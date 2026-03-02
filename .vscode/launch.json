@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug NestJS",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:debug"],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true,
+      "restart": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Unit Tests",
+      "program": "${workspaceFolder}/backend/node_modules/.bin/jest",
+      "args": ["--runInBand", "--no-cache", "--watchAll=false"],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest E2E Tests",
+      "program": "${workspaceFolder}/backend/node_modules/.bin/jest",
+      "args": ["--config", "./test/jest-e2e.json", "--runInBand", "--no-cache"],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Current File",
+      "program": "${workspaceFolder}/backend/node_modules/.bin/jest",
+      "args": ["${fileBasenameNoExtension}", "--runInBand", "--no-cache"],
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

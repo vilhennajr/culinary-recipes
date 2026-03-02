@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: culinary-recipes-db-test
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: testpassword
+      MYSQL_DATABASE: culinary_recipes_db_test
+    ports:
+      - '3307:3306'
+    tmpfs:
+      - /var/lib/mysql
+    networks:
+      - culinary-test-network
+
+networks:
+  culinary-test-network:
+    driver: bridge

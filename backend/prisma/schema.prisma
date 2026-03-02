@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid()) @map("id") @db.VarChar(36)
+  name      String?   @map("name") @db.VarChar(100)
+  login     String    @unique @map("login") @db.VarChar(100)
+  password  String    @map("password") @db.VarChar(100)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
+  recipes   Recipe[]
+
+  // Covers all active-user listings (WHERE deleted_at IS NULL ORDER BY created_at)
+  @@index([deletedAt, createdAt], map: "idx_users_active_created")
+  // Covers name-filter queries (WHERE deleted_at IS NULL AND name LIKE ?)
+  @@index([deletedAt, name], map: "idx_users_active_name")
+  @@map("users")
+}
+
+model Category {
+  id        String    @id @default(uuid()) @map("id") @db.VarChar(36)
+  name      String    @unique @map("name") @db.VarChar(100)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
+  recipes   Recipe[]
+
+  // Covers all active-category listings + sort + name filter (WHERE deleted_at IS NULL ORDER BY name)
+  @@index([deletedAt, name], map: "idx_categories_active_name")
+  @@map("categories")
+}
+
+model Recipe {
+  id                     String    @id @default(uuid()) @map("id") @db.VarChar(36)
+  userId                 String    @map("user_id") @db.VarChar(36)
+  categoryId             String?   @map("category_id") @db.VarChar(36)
+  name                   String?   @map("name") @db.VarChar(255)
+  preparationTimeMinutes Int?      @map("preparation_time_minutes") @db.UnsignedInt
+  servings               Int?      @map("servings") @db.UnsignedInt
+  preparationMethod      String    @map("preparation_method") @db.Text
+  ingredients            String?   @map("ingredients") @db.Text
+  createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt              DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+  deletedAt              DateTime? @map("deleted_at") @db.Timestamp(0)
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  category               Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  // Replaces single-column idx_recipes_user_id:
+  // covers findByUserId, search by userId, cascade soft-delete (WHERE user_id = ? AND deleted_at IS NULL)
+  @@index([userId, deletedAt], map: "idx_recipes_user_deleted")
+  // Replaces single-column idx_recipes_category_id:
+  // covers search by categoryId with soft-delete filter
+  @@index([categoryId, deletedAt], map: "idx_recipes_category_deleted")
+  // Covers default listing sort (WHERE deleted_at IS NULL ORDER BY created_at DESC)
+  @@index([deletedAt, createdAt], map: "idx_recipes_active_created")
+  // Covers preparation time range filter (WHERE deleted_at IS NULL AND preparation_time_minutes BETWEEN ? AND ?)
+  @@index([deletedAt, preparationTimeMinutes], map: "idx_recipes_active_prep_time")
+  // Covers servings range filter (WHERE deleted_at IS NULL AND servings BETWEEN ? AND ?)
+  @@index([deletedAt, servings], map: "idx_recipes_active_servings")
+  @@map("recipes")
+}
