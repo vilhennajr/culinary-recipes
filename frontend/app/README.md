@@ -6,6 +6,17 @@ O app funciona **100% offline** — utiliza **expo-sqlite** como banco de dados 
 
 ---
 
+## Quick Start
+
+```bash
+npm install
+npx expo start --clear
+```
+
+Baixe o aplicativo **Expo Go** no seu celular ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) · [iOS](https://apps.apple.com/app/expo-go/id982107779)), abra-o e aponte a câmera para o **QR code** exibido no terminal.
+
+---
+
 ## Stack
 
 | Tecnologia            | Versão   | Uso                                     |
@@ -39,6 +50,7 @@ O app funciona **100% offline** — utiliza **expo-sqlite** como banco de dados 
 - **Skeleton screens** animados (pulse) durante carregamento inicial e paginação
 - Busca por nome em tempo real com debounce via `fetchRecipes`
 - Criar, editar e excluir receita
+- Compartilhar receita como PDF via diálogo nativo (WhatsApp, e-mail, Drive, etc.)
 - Seleção de categoria via picker horizontal com chips
 - Campos de ingredientes e modo de preparo como área de texto multiline
 - **Seed automático**: 20 receitas de exemplo criadas para todo novo usuário em uma única transação SQLite
@@ -137,45 +149,18 @@ src/
 
 ---
 
-## Decisões arquiteturais
-
-### Por que expo-sqlite e não MMKV ou AsyncStorage?
-
-`expo-sqlite` oferece suporte a SQL completo com LIMIT/OFFSET para paginação real, transações atômicas (seed dos 20 registros) e relacionamento via foreign key — requisitos que key/value stores não atendem de forma natural.
-
-### Por que Zustand e não Context API?
-
-Zustand permite acesso estático ao estado via `useStore.getState()` fora de componentes (útil para verificar erros após ações assíncronas nas screens), seletores sem re-render desnecessário e uma API minimalista sem boilerplate de Provider/Reducer.
-
-### Por que `pendingPrefill.ts` e não parâmetros de rota para o prefill de senha?
-
-Senhas em parâmetros de navegação ficam expostas no histórico do stack navigator. O módulo `pendingPrefill` armazena as credenciais de forma efêmera em memória e as consome uma única vez — eliminando a exposição sem adicionar estado no store.
-
-### `isFetchingMore` vs `isLoading` para paginação
-
-Separar os dois estados permite que o `RefreshControl` (pull-to-refresh) use `isLoading` sem interferir na paginação, e que o `ListFooterComponent` mostre skeletons apenas durante `fetchNextPage`, sem afetar o carregamento inicial da lista.
-
-### Busca com debounce
-
-`useDebounce<T>(value, delay)` — hook genérico que atrasa a propagação do valor por 300 ms. Evita um `SELECT` SQL por keystroke; a chamada real só ocorre quando o usuário para de digitar.
-
-### `Promise<Recipe | null>` em vez de type cast
-
-`create` e `update` no `recipe.store` retornam `Recipe | null`. Em caso de erro, retornam `null` e persistem a mensagem em `state.error`. As screens verificam `if (recipe)` antes de navegar — sem `as unknown as Recipe` e sem rethrowing de exceções.
-
----
-
 ## Qualidade de código
 
 - **ESLint** — `@typescript-eslint`, `react-hooks`, `react-native` rules
 - **Prettier** — `singleQuote: true`, `trailingComma: "all"`, `printWidth: 100`
 - **TypeScript strict** — `tsc --noEmit` com zero erros
-- **Jest + jest-expo** — 64 testes, 0 falhas
+- **Jest + jest-expo** — 78 testes, 0 falhas
 
 ### Cobertura de testes
 
 | Módulo                    | Cenários cobertos                                                                                                  |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `utils/shareRecipePdf`    | Geração de HTML, categoria, ingredientes opcionais, campos nulos, erro de disponibilidade, propagação de erros     |
 | `utils/validators`        | Schemas Zod: campos válidos, inválidos, coerção numérica, opcionais                                                |
 | `utils/errors`            | Error, string, tipos desconhecidos (null, number, object)                                                          |
 | `utils/pendingPrefill`    | Set, consume (limpa), overwrite, consume vazio                                                                     |
@@ -193,8 +178,52 @@ npm install
 npm run start          # Expo Dev Server (escanear QR code com Expo Go)
 npm run android        # Android emulator
 npm run ios            # iOS simulator (macOS)
-npm run lint           # ESLint
-npm run typecheck      # tsc --noEmit
-npm run test           # Jest (64 testes)
+```
+
+### Lint
+
+```bash
+npm run lint           # ESLint (report)
+npm run lint:fix       # ESLint (corrige automaticamente)
+```
+
+### Formatação
+
+```bash
+npm run format         # Prettier (formata)
+npm run format:check   # Prettier (verifica sem alterar)
+```
+
+### Testes
+
+```bash
+npm run test           # Jest (78 testes)
+npm run test:watch     # Jest em modo watch
 npm run test:coverage  # Jest com relatório de cobertura
 ```
+
+---
+
+## Screenshots
+
+### Autenticação
+
+![Login](docs/images/app-sign-in.jpeg)
+
+![Cadastro](docs/images/app-sign-up.jpeg)
+
+### Receitas
+
+![Listagem de receitas](docs/images/app-list-1.jpeg)
+
+![Listagem de receitas (paginação)](docs/images/app-list-2.jpeg)
+
+![Criar receita](docs/images/app-create.jpeg)
+
+![Editar receita](docs/images/app-edit.jpeg)
+
+![Visualizar receita](docs/images/app-view.jpeg)
+
+### Cobertura de testes
+
+![Cobertura de testes](docs/images/app-test-coverage.png)

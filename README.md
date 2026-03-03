@@ -1,10 +1,12 @@
 # Culinary Recipes
 
-Full-stack application for managing culinary recipes, built with NestJS (backend) and Vue 3 (frontend), fully containerized with Docker.
+Aplicação full-stack para gerenciamento de receitas culinárias, desenvolvida com NestJS (backend), Vue 3 (frontend web) e React Native + Expo (app mobile), totalmente containerizada com Docker.
 
 ---
 
 ## Como rodar o projeto
+
+### Web (Docker)
 
 **Pré-requisito:** Docker e Docker Compose instalados.
 
@@ -22,6 +24,18 @@ Após a inicialização:
 
 > O Docker Compose sobe os três serviços em ordem: **MySQL → API → Frontend**. A API aguarda o banco estar saudável antes de iniciar, e o frontend aguarda a API antes de servir os assets.
 
+### App mobile
+
+**Pré-requisito:** [Node.js](https://nodejs.org) instalado e o app **Expo Go** no celular ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) · [iOS](https://apps.apple.com/app/expo-go/id982107779)).
+
+```bash
+cd frontend/app
+npm install
+npx expo start --clear
+```
+
+Aponte a câmera do celular para o **QR code** exibido no terminal. O app abre diretamente no Expo Go, sem necessidade de build nativo.
+
 ---
 
 ## Arquitetura
@@ -30,17 +44,19 @@ Após a inicialização:
 culinary-recipes/
 ├── backend/        # API REST — NestJS + Prisma + MySQL
 ├── frontend/web/   # SPA — Vue 3 + TypeScript + Vite
+├── frontend/app/   # Mobile — React Native + Expo (iOS + Android)
 └── docker-compose.yml
 ```
 
 ### Stack
 
-| Camada   | Tecnologia                                 |
-| -------- | ------------------------------------------ |
-| Banco    | MySQL 8.0 (Docker volume persistente)      |
-| Backend  | NestJS 10, Prisma 5, JWT, bcrypt           |
-| Frontend | Vue 3.4, TypeScript, Vite 5, TailwindCSS 3 |
-| Servidor | nginx 1.27 (proxy `/api` → backend)        |
+| Camada       | Tecnologia                                          |
+| ------------ | --------------------------------------------------- |
+| Banco        | MySQL 8.0 (Docker volume persistente)               |
+| Backend      | NestJS 10, Prisma 5, JWT, bcrypt                    |
+| Frontend Web | Vue 3.4, TypeScript, Vite 5, TailwindCSS 3          |
+| Frontend App | React Native 0.81, Expo SDK 54, NativeWind, Zustand |
+| Servidor     | nginx 1.27 (proxy `/api` → backend)                 |
 
 ---
 
@@ -51,6 +67,9 @@ culinary-recipes/
 - Paginação, busca e ordenação em todos os recursos
 - Soft delete em todas as entidades
 - Interface web responsiva com feedback visual (toasts, validações)
+- Impressão de receitas como PDF diretamente do navegador
+- App mobile **100% offline** (expo-sqlite) com infinite scroll e skeleton screens
+- Compartilhamento de receita como PDF via diálogo nativo do celular
 - Testes unitários e E2E no backend
 - Pipeline de qualidade de código: ESLint + Prettier
 
@@ -67,7 +86,8 @@ frontend → porta 80   (nginx — SPA + proxy /api)
 Veja os detalhes de cada parte:
 
 - [Backend](./backend/README.md)
-- [Frontend](./frontend/web/README.md)
+- [Frontend Web](./frontend/web/README.md)
+- [Frontend App (mobile)](./frontend/app/README.md)
 
 ---
 
@@ -122,3 +142,23 @@ Veja os detalhes de cada parte:
 ![Cobertura — Backend](./backend/docs/images/backend-test-coverage.png)
 
 ![Cobertura — Frontend](./backend/docs/images/frontend-test-coverage.png)
+
+### App mobile
+
+![Login](./frontend/app/docs/images/app-sign-in.jpeg)
+
+![Cadastro](./frontend/app/docs/images/app-sign-up.jpeg)
+
+![Listagem de receitas](./frontend/app/docs/images/app-list-1.jpeg)
+
+![Listagem de receitas (paginação)](./frontend/app/docs/images/app-list-2.jpeg)
+
+![Criar receita](./frontend/app/docs/images/app-create.jpeg)
+
+![Editar receita](./frontend/app/docs/images/app-edit.jpeg)
+
+![Visualizar receita](./frontend/app/docs/images/app-view.jpeg)
+
+### Cobertura de testes — App mobile
+
+![Cobertura de testes](./frontend/app/docs/images/app-test-coverage.png)

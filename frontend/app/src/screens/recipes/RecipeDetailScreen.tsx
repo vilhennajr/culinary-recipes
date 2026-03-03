@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Alert } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -10,6 +10,7 @@ import { Button } from '../../components/atoms/Button';
 import { useRecipeStore } from '../../store/recipe.store';
 import type { AppStackParamList } from '../../types';
 import { CATEGORIES } from '../../constants/categories';
+import { shareRecipePdf } from '../../utils/shareRecipePdf';
 
 type RouteP = RouteProp<AppStackParamList, 'RecipeDetail'>;
 type Nav = NativeStackNavigationProp<AppStackParamList, 'RecipeDetail'>;
@@ -20,6 +21,7 @@ export function RecipeDetailScreen() {
   const { id } = route.params;
   const { currentRecipe, isLoading, isSaving, error, fetchById, remove, clearCurrent, clearError } =
     useRecipeStore();
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     fetchById(id);
@@ -28,6 +30,21 @@ export function RecipeDetailScreen() {
       clearError();
     };
   }, [id, fetchById, clearCurrent, clearError]);
+
+  const handleShare = async () => {
+    if (!currentRecipe) return;
+    setIsSharing(true);
+    try {
+      await shareRecipePdf(currentRecipe);
+    } catch (err) {
+      Alert.alert(
+        'Erro',
+        err instanceof Error ? err.message : 'Não foi possível compartilhar a receita.',
+      );
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   const handleDelete = () => {
     Alert.alert('Excluir receita', 'Tem certeza? Essa ação não pode ser desfeita.', [
@@ -103,7 +120,16 @@ export function RecipeDetailScreen() {
           </AppText>
         </View>
 
-        <View className="flex-row gap-3 mt-2">
+        <Button
+          label={isSharing ? '' : 'Compartilhar PDF'}
+          variant="primary"
+          size="md"
+          className="mb-3"
+          loading={isSharing}
+          onPress={handleShare}
+        />
+
+        <View className="flex-row gap-3">
           <Button
             label="Editar"
             variant="outline"

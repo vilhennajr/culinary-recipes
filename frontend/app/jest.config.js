@@ -23,6 +23,7 @@ module.exports = {
     '!src/components/**',
     '!src/hooks/**',
     '!src/constants/**',
+    '!src/database/**',
     '!src/main.ts',
   ],
   coverageDirectory: 'coverage',

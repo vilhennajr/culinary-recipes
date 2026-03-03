@@ -6,15 +6,15 @@ REST API desenvolvida com **NestJS**, aplicando **Arquitetura Hexagonal (Ports &
 
 ## Stack
 
-| Tecnologia       | Versão  | Uso                               |
-|------------------|---------|-----------------------------------|
-| NestJS           | 10      | Framework principal               |
-| Prisma           | 5       | ORM / migrations / seed           |
-| MySQL            | 8.0     | Banco de dados relacional         |
-| JWT + Passport   | —       | Autenticação stateless            |
-| bcrypt           | 5       | Hash de senhas                    |
-| Swagger          | 7       | Documentação automática da API    |
-| Jest             | —       | Testes unitários e E2E            |
+| Tecnologia     | Versão | Uso                            |
+| -------------- | ------ | ------------------------------ |
+| NestJS         | 10     | Framework principal            |
+| Prisma         | 5      | ORM / migrations / seed        |
+| MySQL          | 8.0    | Banco de dados relacional      |
+| JWT + Passport | —      | Autenticação stateless         |
+| bcrypt         | 5      | Hash de senhas                 |
+| Swagger        | 7      | Documentação automática da API |
+| Jest           | —      | Testes unitários e E2E         |
 
 ---
 
@@ -69,13 +69,13 @@ graph TD
 
 #### SOLID
 
-| Princípio | Aplicação |
-|---|---|
-| **S** — Single Responsibility | Cada Use Case tem uma única responsabilidade (ex.: `CreateRecipeUseCase`, `DeleteUserUseCase`) |
-| **O** — Open/Closed | Novos recursos adicionam novos Use Cases sem alterar os existentes |
-| **L** — Liskov Substitution | `PrismaUserRepository` substitui `UserRepository` (interface) sem quebrar contratos |
-| **I** — Interface Segregation | Repositórios possuem contratos específicos por entidade |
-| **D** — Dependency Inversion | Use Cases dependem de abstrações (`UserRepository`), não de implementações (`PrismaUserRepository`) |
+| Princípio                     | Aplicação                                                                                           |
+| ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| **S** — Single Responsibility | Cada Use Case tem uma única responsabilidade (ex.: `CreateRecipeUseCase`, `DeleteUserUseCase`)      |
+| **O** — Open/Closed           | Novos recursos adicionam novos Use Cases sem alterar os existentes                                  |
+| **L** — Liskov Substitution   | `PrismaUserRepository` substitui `UserRepository` (interface) sem quebrar contratos                 |
+| **I** — Interface Segregation | Repositórios possuem contratos específicos por entidade                                             |
+| **D** — Dependency Inversion  | Use Cases dependem de abstrações (`UserRepository`), não de implementações (`PrismaUserRepository`) |
 
 #### DDD (Domain-Driven Design)
 
@@ -97,38 +97,42 @@ graph TD
 ## Recursos da API
 
 ### Autenticação
-| Método | Endpoint         | Descrição                |
-|--------|------------------|--------------------------|
-| POST   | `/auth/register` | Cadastro de usuário       |
-| POST   | `/auth/login`    | Login — retorna JWT       |
+
+| Método | Endpoint         | Descrição           |
+| ------ | ---------------- | ------------------- |
+| POST   | `/auth/register` | Cadastro de usuário |
+| POST   | `/auth/login`    | Login — retorna JWT |
 
 > Documentação interativa disponível em **http://localhost:3000/api/docs** (Swagger UI).
 
-### Usuários *(requer JWT)*
-| Método | Endpoint        | Descrição                          |
-|--------|-----------------|------------------------------------|
-| GET    | `/users`        | Listagem paginada com busca        |
-| GET    | `/users/:id`    | Buscar por ID                      |
-| PATCH  | `/users/:id`    | Atualizar dados                    |
-| DELETE | `/users/:id`    | Soft delete (+ soft delete receitas)|
+### Usuários _(requer JWT)_
 
-### Categorias *(requer JWT)*
-| Método | Endpoint           | Descrição               |
-|--------|--------------------|-------------------------|
-| GET    | `/categories`      | Listagem paginada        |
-| GET    | `/categories/:id`  | Buscar por ID            |
-| POST   | `/categories`      | Criar categoria          |
-| PATCH  | `/categories/:id`  | Atualizar               |
-| DELETE | `/categories/:id`  | Soft delete             |
+| Método | Endpoint     | Descrição                            |
+| ------ | ------------ | ------------------------------------ |
+| GET    | `/users`     | Listagem paginada com busca          |
+| GET    | `/users/:id` | Buscar por ID                        |
+| PATCH  | `/users/:id` | Atualizar dados                      |
+| DELETE | `/users/:id` | Soft delete (+ soft delete receitas) |
 
-### Receitas *(requer JWT)*
-| Método | Endpoint        | Descrição                                         |
-|--------|-----------------|---------------------------------------------------|
-| GET    | `/recipes`      | Busca paginada (filtros: nome, categoria, tempo, porções) |
-| GET    | `/recipes/:id`  | Buscar por ID                                     |
-| POST   | `/recipes`      | Criar receita                                     |
-| PATCH  | `/recipes/:id`  | Atualizar                                         |
-| DELETE | `/recipes/:id`  | Soft delete                                       |
+### Categorias _(requer JWT)_
+
+| Método | Endpoint          | Descrição         |
+| ------ | ----------------- | ----------------- |
+| GET    | `/categories`     | Listagem paginada |
+| GET    | `/categories/:id` | Buscar por ID     |
+| POST   | `/categories`     | Criar categoria   |
+| PATCH  | `/categories/:id` | Atualizar         |
+| DELETE | `/categories/:id` | Soft delete       |
+
+### Receitas _(requer JWT)_
+
+| Método | Endpoint       | Descrição                                                 |
+| ------ | -------------- | --------------------------------------------------------- |
+| GET    | `/recipes`     | Busca paginada (filtros: nome, categoria, tempo, porções) |
+| GET    | `/recipes/:id` | Buscar por ID                                             |
+| POST   | `/recipes`     | Criar receita                                             |
+| PATCH  | `/recipes/:id` | Atualizar                                                 |
+| DELETE | `/recipes/:id` | Soft delete                                               |
 
 ---
 
@@ -185,14 +189,14 @@ Todas as entidades possuem `deleted_at`. Nenhum registro é removido fisicamente
 
 Todos os índices colocam `deleted_at` como coluna líder para garantir que as queries com filtro soft-delete usem índice em vez de full scan:
 
-| Índice                          | Query coberta                              |
-|---------------------------------|---------------------------------------------|
-| `(deleted_at, created_at)`      | Listagem padrão ordenada por data           |
-| `(deleted_at, name)`            | Filtro por nome com soft delete             |
-| `(user_id, deleted_at)`         | Receitas por usuário                        |
-| `(category_id, deleted_at)`     | Receitas por categoria                      |
+| Índice                                   | Query coberta                     |
+| ---------------------------------------- | --------------------------------- |
+| `(deleted_at, created_at)`               | Listagem padrão ordenada por data |
+| `(deleted_at, name)`                     | Filtro por nome com soft delete   |
+| `(user_id, deleted_at)`                  | Receitas por usuário              |
+| `(category_id, deleted_at)`              | Receitas por categoria            |
 | `(deleted_at, preparation_time_minutes)` | Filtro por tempo de preparo       |
-| `(deleted_at, servings)`        | Filtro por porções                          |
+| `(deleted_at, servings)`                 | Filtro por porções                |
 
 ---
 
@@ -246,6 +250,29 @@ cp .env.example .env     # configurar DATABASE_URL e JWT_SECRET
 npm run prisma:migrate
 npm run prisma:seed
 npm run start:dev
+```
+
+### Lint
+
+```bash
+npm run lint       # ESLint (reporta e corrige automaticamente)
+```
+
+### Formatação
+
+```bash
+npm run format     # Prettier (formata)
+```
+
+### Testes
+
+```bash
+npm run test           # Jest unitários
+npm run test:watch     # Jest em modo watch
+npm run test:cov       # Jest unitários com cobertura
+npm run test:e2e       # Testes E2E
+npm run test:e2e:cov   # Testes E2E com cobertura
+npm run test:all       # Unitários + E2E com cobertura
 ```
 
 ---

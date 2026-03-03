@@ -156,8 +156,26 @@ O nginx está configurado para:
 npm install
 npm run dev        # http://localhost:5173 (proxy /api → localhost:3000)
 npm run build      # build de produção
-npm run lint       # ESLint
-npm run format     # Prettier
+```
+
+### Lint
+
+```bash
+npm run lint       # ESLint (reporta e corrige automaticamente)
+```
+
+### Formatação
+
+```bash
+npm run format     # Prettier (formata)
+```
+
+### Testes
+
+```bash
+npm run test           # Vitest (executa todos os testes)
+npm run test:watch     # Vitest em modo watch
+npm run test:coverage  # Vitest com relatório de cobertura
 ```
 
 ---
