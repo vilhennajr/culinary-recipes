@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Culinary Recipes",
+    "slug": "culinary-recipes-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff7ed"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.culinaryrecipes.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#fff7ed",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.culinaryrecipes.app",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-secure-store"]
+  }
+}
